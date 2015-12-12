@@ -16,11 +16,6 @@
   <!--script type="text/babel" src="scripts/example.js"></script-->
   <script type="text/babel">
 
-  // var data = [
-  //   {id: 1, author: "Ryan", text: "This is the first comment."},
-  //   {id: 2, author: "Daniel", text: "This is the *second* comment."}
-  // ];
-
   var CommentBox = React.createClass({//parent of CommentList and CommentForm
     loadCommentsFromServer: function (){
       $.ajax({
@@ -37,6 +32,11 @@
     },
 
     handleCommentSubmit: function(comment){
+      var comments = this.state.data;
+      comment.id = Date.now();
+      var newComments = comments.concat([comment]);
+      this.setState({data: newComments});
+
       $.ajax({
         url: this.props.url,
         dataType: 'json',
@@ -44,9 +44,9 @@
         data: comment,
         success: function(data) {
           this.setState({data: data});
-          console.log("this:", this);
         }.bind(this),
         error: function(xhr, status, err) {
+          this.setState({data: comments});
           console.error(this.props.url, status, err.toString());
         }.bind(this)
       });
@@ -115,7 +115,6 @@
       this.setState({author: e.target.value});
     },
     handleTextChange: function(e) {
-      console.log("e:", e);
       this.setState({text: e.target.value});
     },
     handleSubmit: function(e) {
